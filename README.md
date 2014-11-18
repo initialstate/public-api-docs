@@ -2,6 +2,8 @@
 **PRE-RELEASE**
 > *NOTE*: This is a prerelease api and is subject to change frequently without notice or versioning while under development.
 
+> *NOTE*: This api, while functionaly, doesn't provide a way to consume the data created by it just yet. That is in the works!
+
 ##[POST]
 
 `https://groker.initialstate.com/batch_logs`
@@ -24,7 +26,7 @@ The request body is an array of JSON objects with the following properties
 |`dt`	|ISO 8601 timestamp (redundent, see `e`)|
 |`e`	|epoc representation of timestamp		|
 |`sn`	|signal name							|
-|`tid`	|`guid` to relate a specific execution	|
+|`tid`	|`guid` of sessionId to associate to Initial State Bucket|
 
 
 ####Example:
