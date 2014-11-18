@@ -23,7 +23,6 @@ The request body is an array of JSON objects with the following properties
 |----|-----------------------------------------|
 |`v`	|value of data point					|
 |`b`	|bucket name							|
-|`dt`	|ISO 8601 timestamp (redundent, see `e`)|
 |`e`	|epoc representation of timestamp		|
 |`sn`	|signal name							|
 |`tid`	|`guid` of sessionId to associate to Initial State Bucket|
@@ -36,7 +35,6 @@ The request body is an array of JSON objects with the following properties
 	{
 		"v": 1,
 		"b": "some_bucket_name",
-		"dt": "2014-11-17 16:11:28.913554",
 		"sn": "example_signal",
 		"e": 1416262288.913554,
 		"tid": "dc5c3b77-2c9a-4efd-a4ee-68759114e356"
