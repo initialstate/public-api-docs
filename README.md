@@ -1,4 +1,4 @@
-#Groker Api
+#Logging Api
 **PRE-RELEASE**
 > *NOTE*: This is a prerelease api and is subject to change frequently without notice or versioning while under development.
 
