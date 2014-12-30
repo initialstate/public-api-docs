@@ -1,0 +1,150 @@
+FORMAT: 1A
+HOST: https://groker-dev.initialstate.com/api
+
+# Initial State Events Api
+Here you'll find documentation on how to consume the events api for Initial State. At the moment, this api allows sending buffered stream event data to Initial State.
+
+# Group Event Buckets
+**Buckets** are groupings of `event` data. They associate events together by a unique `bucketKey`. The `bucketKey`s uniqueness is scoped to a client key, so two buckets with the same bucketKey on two different client keys will result in two unique buckets.
+
+## Buckets [/buckets]
+A `bucket` is a collection of `event` data.
+
+Common Scenarios:
+- `201`: If a `POST` is made to `/buckets` with a clientKey/bucketKey combination that is unique, doesn't exist, and can be created, the api will respond with a `201` Created response.
+- `204`: If a `POST` is made to `/buckets` with a clientKey/bucketKey combination that has already been created, the api will respond with a `204` No Content response.
+
+**Custom Headers**
+
+|name|notes|
+|----|-----|
+|`X-IS-ClientKey`|This is the client key generated from www.initialstate.com account|
+
+**Bucket JSON Entity**
+
+|parameter|required|type|illegal characters|length limit|notes|
+|---------|--------|----|-----|---|---|
+|bucketKey|*true*|`string`| `:`, `"`, `'`|250 characters|associates event data|
+|bucketName|*false*|`string`|none|250 characters|friendly name of the bucket, shows in the log shelf in the UI|
+
+### Create a bucket [POST]
+
++ Request
+
+    + Header
+    
+            Content-Type: application/json
+            X-IS-ClientKey: 1234
+    
+    + Body
+    
+            {
+                "bucketKey": "apiary_bucket",
+                "bucketName": "Apiary Bucket"
+            }
+
++ Response 201 (application/json)
++ Response 204
++ Response 401
++ Response 403 (text/plain)
+
+    + Body
+    
+            "ACCESS_DENIED_KEY"
+            
++ Response 500
+
+    + Body
+    
+            "CORE_API_ERROR"
+
+# Group Event Data
+These endpoints are related to the `events` resource. An `event` is simply a data point with a timestamp.
+
+## Events [/events]
+### Send Events [POST]
+This is the main endpoint for shipping data to Initial State's Events Api. The data is sent in an array of JSON objects that represent individual events. You can submit one event or an array of events where the body size is not larger than 1 megabyte.
+
+**Limits**
+- `Content-Length` <= 1 megabyte
+
+**Custom Headers**
+
+|name|notes|
+|----|-----|
+|`X-IS-ClientKey`|This is the client key generated from www.initialstate.com account|
+|`X-IS-BucketKey`|This is a user generated key and can be any string exluding characters `:`, `"`, `'`. See *Bucket Creation* endpoint|
+
+**Event JSON Entity**
+
+|name|required|type|max length|notes|
+|----|----|-----|---|---|
+|signal |*true*|`string`|100 characters|signal name/key|
+|value |*true*|`string`, `bool`, or `number`|2000 characters|signal value|
+|epoch |*true*|`number`||epoch|
+
++ Request
+    + Headers
+            
+            Content-Type: application/json
+            X-IS-ClientKey: 1234
+            X-IS-BucketKey: apiary_bucket
+    
+    + Body
+    
+            [
+                {
+                    "signal": "document_signal",
+                    "value": "1",
+                    "epoch": 1419876021.778477,
+                },
+                {
+                    "signal": "document_signal",
+                    "value": "2",
+                    "epoch": 1419876022.778477,
+                },
+                {
+                    "signal": "document_signal",
+                    "value": "3",
+                    "epoch": 1419876023.778477,
+                },
+                {
+                    "signal": "document_signal",
+                    "value": "4",
+                    "epoch": 1419876024.778477,
+                },
+                {
+                    "signal": "document_signal",
+                    "value": "5",
+                    "epoch": 1419876025.778477,
+                },
+                {
+                    "signal": "document_signal",
+                    "value": "6",
+                    "epoch": 1419876026.778477,
+                },
+                {
+                    "signal": "document_signal",
+                    "value": "7",
+                    "epoch": 1419876026.778477,
+                },
+                {
+                    "signal": "document_signal",
+                    "value": "8",
+                    "epoch": 1419876027.778477,
+                },
+                {
+                    "signal": "document_signal",
+                    "value": "9",
+                    "epoch": 1419876028.778477,
+                },
+                {
+                    "signal": "document_signal",
+                    "value": "10",
+                    "epoch": 1419876029.778477,
+                }
+            ]
+
++ Response 204
++ Response 401
++ Response 500
