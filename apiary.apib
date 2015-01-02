@@ -4,6 +4,24 @@ HOST: https://groker-dev.initialstate.com/api
 # Initial State Events Api
 Here you'll find documentation on how to consume the events api for Initial State. At the moment, this api allows sending buffered stream event data to Initial State.
 
+# Group Versioning
+This api is versioned with **semver** style versions, if you're not familiar with semver, check it out [here](http://semver.org/). The api respects the `Accept-Version` HTTP header to provide predictable request/response versioning. You can check the current supported versions by performing a `GET` on the `/versions` route. If you don't include an `Accept-Version` header, the api assumes that you want the latest version. The value of `Accept-Version` can be specified like NPM dependencies.
+
+## Versions [/versions]
+A `version` is a string `semver`.
+
+### Get supported versions [GET]
+
++ Response 200 (application/json)
+
+    + Body
+    
+            [
+                "0.0.1"
+            ]
+
+        
+
 # Group Event Buckets
 **Buckets** are groupings of `event` data. They associate events together by a unique `bucketKey`. The `bucketKey`s uniqueness is scoped to a client key, so two buckets with the same bucketKey on two different client keys will result in two unique buckets.
 
@@ -35,6 +53,7 @@ Common Scenarios:
     
             Content-Type: application/json
             X-IS-ClientKey: 1234
+            Accept-Version: ~0
     
     + Body
     
@@ -89,6 +108,7 @@ This is the main endpoint for shipping data to Initial State's Events Api. The d
             Content-Type: application/json
             X-IS-ClientKey: 1234
             X-IS-BucketKey: apiary_bucket
+            Acept-Version: ~
     
     + Body
     
