@@ -40,7 +40,7 @@ JSON request body
 
 
 ###Response Codes:
-- `204` Created
+- `201` Created
 - `401` Unauthorized (`clientKey` is either incorrect, or url isn't correct)
 - `403` Forbidden (`clientKey` is missing or invalid)
 - `404` Check your url
@@ -86,5 +86,5 @@ The request body is an array of JSON objects with the following properties
 |`tid`	|`guid`|sessionId to associate to Initial State Bucket|
 
 ###Response Codes:
-- `204` Created
+- `204` Empty Response
 - `403` Forbidden (`clientKey` is either missing or invalid)
