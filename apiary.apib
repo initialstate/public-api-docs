@@ -1,5 +1,5 @@
 FORMAT: 1A
-HOST: https://groker-dev.initialstate.com/api
+HOST: https://groker.initialstate.com/api
 
 # Initial State Events Api
 Here you'll find documentation on how to consume the events api for Initial State. At the moment, this api allows sending buffered stream event data to Initial State.
@@ -23,27 +23,27 @@ A `version` is a string `semver`.
         
 
 # Group Event Buckets
-**Buckets** are groupings of `event` data. They associate events together by a unique `bucketKey`. The `bucketKey`s uniqueness is scoped to a client key, so two buckets with the same bucketKey on two different client keys will result in two unique buckets.
+**Buckets** are groupings of `event` data. They associate events together by a unique `bucketKey`. The `bucketKey`s uniqueness is scoped to an access key, so two buckets with the same bucketKey on two different access keys will result in two unique buckets.
 
 ## Buckets [/buckets]
 A `bucket` is a collection of `event` data.
 
 Common Scenarios:
-- `201`: If a `POST` is made to `/buckets` with a clientKey/bucketKey combination that is unique, doesn't exist, and can be created, the api will respond with a `201` Created response.
-- `204`: If a `POST` is made to `/buckets` with a clientKey/bucketKey combination that has already been created, the api will respond with a `204` No Content response.
+- `201`: If a `POST` is made to `/buckets` with a accessKey/bucketKey combination that is unique, doesn't exist, and can be created, the api will respond with a `201` Created response.
+- `204`: If a `POST` is made to `/buckets` with a accessKey/bucketKey combination that has already been created, the api will respond with a `204` No Content response.
 
 **Custom Headers**
 
 |name|notes|
 |----|-----|
-|`X-IS-ClientKey`|This is the client key generated from www.initialstate.com account|
+|`X-IS-AccessKey`|This is the access key generated from www.initialstate.com account|
 
 **Bucket JSON Entity**
 
 |parameter|required|type|illegal characters|length limit|notes|
 |---------|--------|----|-----|---|---|
 |bucketKey|*true*|`string`| `:`, `"`, `'`|250 characters|associates event data|
-|bucketName|*false*|`string`|none|250 characters|friendly name of the bucket, shows in the log shelf in the UI|
+|bucketName|*false*|`string`|none|250 characters|friendly name of the bucket, shows in the bucket shelf in the UI|
 
 ### Create a bucket [POST]
 
@@ -52,7 +52,7 @@ Common Scenarios:
     + Header
     
             Content-Type: application/json
-            X-IS-ClientKey: 1234
+            X-IS-AccessKey: 1234
             Accept-Version: ~0
     
     + Body
@@ -91,7 +91,7 @@ This is the main endpoint for shipping data to Initial State's Events Api. The d
 
 |name|notes|
 |----|-----|
-|`X-IS-ClientKey`|This is the client key generated from www.initialstate.com account|
+|`X-IS-AccessKey`|This is the access key generated from www.initialstate.com account|
 |`X-IS-BucketKey`|This is a user generated key and can be any string exluding characters `:`, `"`, `'`. See *Bucket Creation* endpoint|
 
 **Event JSON Entity**
@@ -106,7 +106,7 @@ This is the main endpoint for shipping data to Initial State's Events Api. The d
     + Headers
             
             Content-Type: application/json
-            X-IS-ClientKey: 1234
+            X-IS-AccessKey: 1234
             X-IS-BucketKey: apiary_bucket
             Accept-Version: ~0
     
@@ -114,52 +114,52 @@ This is the main endpoint for shipping data to Initial State's Events Api. The d
     
             [
                 {
-                    "signal": "document_signal",
+                    "key": "tempurature",
                     "value": "1",
                     "epoch": 1419876021.778477,
                 },
                 {
-                    "signal": "document_signal",
+                    "key": "temperature",
                     "value": "2",
                     "epoch": 1419876022.778477,
                 },
                 {
-                    "signal": "document_signal",
+                    "key": "temperature",
                     "value": "3",
                     "epoch": 1419876023.778477,
                 },
                 {
-                    "signal": "document_signal",
+                    "key": "temperature",
                     "value": "4",
                     "epoch": 1419876024.778477,
                 },
                 {
-                    "signal": "document_signal",
+                    "key": "temperature",
                     "value": "5",
                     "epoch": 1419876025.778477,
                 },
                 {
-                    "signal": "document_signal",
+                    "key": "temperature",
                     "value": "6",
                     "epoch": 1419876026.778477,
                 },
                 {
-                    "signal": "document_signal",
+                    "key": "temperature",
                     "value": "7",
                     "epoch": 1419876026.778477,
                 },
                 {
-                    "signal": "document_signal",
+                    "key": "temperature",
                     "value": "8",
                     "epoch": 1419876027.778477,
                 },
                 {
-                    "signal": "document_signal",
+                    "key": "temperature",
                     "value": "9",
                     "epoch": 1419876028.778477,
                 },
                 {
-                    "signal": "document_signal",
+                    "key": "temperature",
                     "value": "10",
                     "epoch": 1419876029.778477,
                 }
@@ -167,4 +167,10 @@ This is the main endpoint for shipping data to Initial State's Events Api. The d
 
 + Response 204
 + Response 401
++ Response 402 (application/json)
+    + Body
+    
+            {
+                "message": "Event limit exceeded for current cycle..."
+            }
 + Response 500
