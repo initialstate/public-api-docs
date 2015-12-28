@@ -85,7 +85,14 @@ These endpoints are related to the `events` resource. An `event` is simply a dat
 This is the main endpoint for shipping data to Initial State's Events Api. The data is sent in an array of JSON objects that represent individual events. You can submit one event or an array of events where the body size is not larger than 1 megabyte.
 
 **Limits**
-- `Content-Length` <= 1 megabyte
+
+|type|limit|exceeded response HTTP status code|
+|----|-----|----------------------|
+|`Content-Length`|<= 1 megabyte|`413` Request Entity Too Large|
+|request rate|5 r/s (for non-enterprise)|`429` Too Many Requests|
+
+**Recommended Max Throughput**
+- 5 r/s with 10 events/request
 
 **Custom Headers**
 
@@ -95,7 +102,7 @@ This is the main endpoint for shipping data to Initial State's Events Api. The d
 |`X-IS-BucketKey`|This is a user generated key and can be any string exluding characters `:`, `"`, `'`. See *Bucket Creation* endpoint|
 
 **Event JSON Entity**
-> **Note**: JSON events can be sent as either a single object as the root of the http body, or inside an array of events with the root of the HTTP body being an array `[]`
+> **Note**: JSON events can be sent as either a single object at the root of the http body i.e. `{"key": "temp", "value": 32}`, or inside an array at the root of the HTTP body `[{"key": "temp", "value": 32}]`
 
 |name|required|type|max length|notes|
 |----|----|-----|---|---|
@@ -104,7 +111,7 @@ This is the main endpoint for shipping data to Initial State's Events Api. The d
 |epoch |*false*|`number`||epoch is in seconds with fractional seconds to right of decimal.|
 |iso8601|*false*|`string`||ISO-8601 Timestamp|
 
-> **Timestamping**: If the client doesn't provide a timestamp, a server timestamp will be automatically provided. If a client provides a valid "epoch" value, the "epoch" will be used instead. If the "iso8601" value is supplied it will be used instead. It's important to note, that if both a valid "epoch" and "iso8601" are supplied, the "epoch" will be used as the source of truth.
+> **Timestamping**: If the client doesn't provide a timestamp, a server timestamp will be automatically provided. If a client provides a valid `epoch` value, the `epoch` will be used instead. If the `iso8601` value is supplied it will be used instead. It's important to note, that if both a valid `epoch` and `iso8601` are supplied, the `epoch` will be used as the source of truth.
 
 + Request
     + Headers
@@ -175,6 +182,7 @@ This is the main endpoint for shipping data to Initial State's Events Api. The d
     + Body
     
             {
-                "message": "Event limit exceeded for current cycs: le..."
+                "message": "Event limit exceeded for current cycle..."
             }
++ Response 429
 + Response 500
