@@ -101,7 +101,7 @@ This is the main endpoint for shipping data to Initial State's Events Api. The d
 |----|----|-----|---|---|
 |key |*true*|`string`|100 characters|stream key name|
 |value |*true*|`string`, `bool`, or `number`|2000 characters|stream value|
-|epoch |*false*|`number`||epoch is in seconds with fractional seconds to left of decimal.|
+|epoch |*false*|`number`||epoch is in seconds with fractional seconds to right of decimal.|
 |iso8601|*false*|`string`||ISO-8601 Timestamp|
 
 > **Timestamping**: If the client doesn't provide a timestamp, a server timestamp will be automatically provided. If a client provides a valid "epoch" value, the "epoch" will be used instead. If the "iso8601" value is supplied it will be used instead. It's important to note, that if both a valid "epoch" and "iso8601" are supplied, the "epoch" will be used as the source of truth.
@@ -175,6 +175,6 @@ This is the main endpoint for shipping data to Initial State's Events Api. The d
     + Body
     
             {
-                "message": "Event limit exceeded for current cycle..."
+                "message": "Event limit exceeded for current cycs: le..."
             }
 + Response 500
