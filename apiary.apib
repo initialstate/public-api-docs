@@ -17,7 +17,10 @@ A `version` is a string `semver`.
     + Body
     
             [
-                "0.0.1"
+                "0.0.1",
+                "0.0.2",
+                "0.0.3",
+                "0.0.4"
             ]
 
         
@@ -25,20 +28,23 @@ A `version` is a string `semver`.
 # Group Event Buckets
 **Buckets** are groupings of `event` data. They associate events together by a unique `bucketKey`. The `bucketKey`s uniqueness is scoped to an access key, so two buckets with the same bucketKey on two different access keys will result in two unique buckets.
 
-## Buckets [/buckets]
+## Buckets JSON [/buckets]
 A `bucket` is a collection of `event` data.
 
-Common Scenarios:
+Common Successful Response Scenarios:
 - `201`: If a `POST` is made to `/buckets` with a accessKey/bucketKey combination that is unique, doesn't exist, and can be created, the api will respond with a `201` Created response.
 - `204`: If a `POST` is made to `/buckets` with a accessKey/bucketKey combination that has already been created, the api will respond with a `204` No Content response.
 
-**Custom Headers**
+**Authentication**
 
-|name|notes|
+Authentication is handled via Access Keys generated from within your [Initial State account](https://www.initialstate.com/app#/account). An example access key looks like this: `fakee8do2JQN3Eos8Ah2FS8uiFD3Ola2`. An Access Key can be provided as an HTTP header, or as a url parameter
+
+|type|name/key|
 |----|-----|
-|`X-IS-AccessKey`|This is the access key generated from www.initialstate.com account|
+|HTTP Header|`X-IS-AccessKey`|
+|URL Parameter|`accessKey`|
 
-**Bucket JSON Entity**
+**Bucket Entity**
 
 |parameter|required|type|illegal characters|length limit|notes|
 |---------|--------|----|-----|---|---|
@@ -71,16 +77,55 @@ Common Scenarios:
     
             "ACCESS_DENIED_KEY"
             
-+ Response 500
++ Response 500 (text/plain)
 
     + Body
     
             "CORE_API_ERROR"
 
+## Buckets no-JSON [/buckets?accessKey={accessKey}&bucketKey={bucketKey}&bucketName={bucketName}]
+A `bucket` is a collection of `event` data.
+
+Common Successful Response Scenarios:
+- `201`: If a `POST` is made to `/buckets` with a accessKey/bucketKey combination that is unique, doesn't exist, and can be created, the api will respond with a `201` Created response.
+- `204`: If a `POST` is made to `/buckets` with a accessKey/bucketKey combination that has already been created, the api will respond with a `204` No Content response.
+
+**Authentication**
+
+Authentication is handled via Access Keys generated from within your [Initial State account](https://www.initialstate.com/app#/account). An example access key looks like this: `fakee8do2JQN3Eos8Ah2FS8uiFD3Ola2`. An Access Key can be provided as an HTTP header, or as a url parameter
+
+|type|name/key|
+|----|-----|
+|HTTP Header|`X-IS-AccessKey`|
+|URL Parameter|`accessKey`|
+
++ Parameters
+    + accessKey (required, string, `fakee8do2JQN3Eos8Ah2FS8uiFD3Ola2`) ... Access Key
+    + bucketKey (required, string, `bucket1sfa`) ... Unique Bucket Key
+    + bucketName (optional, string, `My New Bucket`) ... Friendly Bucket Name
+
+### Create a bucket [POST]
+
++ Response 201 (application/json)
++ Response 204
++ Response 401
++ Response 403 (text/plain)
+
+    + Body
+    
+            "ACCESS_DENIED_KEY"
+            
++ Response 500 (text/plain)
+
+    + Body
+    
+            "CORE_API_ERROR"
+
+
 # Group Event Data
 These endpoints are related to the `events` resource. An `event` is simply a data point with a timestamp.
 
-## Events [/events]
+## Events JSON [/events]
 ### Send Events [POST]
 This is the main endpoint for shipping data to Initial State's Events Api. The data is sent in an array of JSON objects that represent individual events. You can submit one event or an array of events where the body size is not larger than 1 megabyte.
 
@@ -184,5 +229,33 @@ This is the main endpoint for shipping data to Initial State's Events Api. The d
             {
                 "message": "Event limit exceeded for current cycle..."
             }
++ Response 409
++ Response 429
++ Response 500
+
+## Events no-JSON [/events?accessKey={accessKey}&bucketKey={bucketKey}&{eventKey0}={eventValue0}&{eventKey1}={eventValue1}]
+
+This route allows for simple URL encoded parameters that represent events. Each url key-value pair represents an event key and event value being sent to Initial State.
+
++ Parameters
+    + accessKey (required, string, `fakee8do2JQN3Eos8Ah2FS8uiFD3Ola2`) ... Access Key
+    + bucketKey (required, string, `bucket1sfa`) ... Bucket Key representing bucket for the events in request
+    + eventKey0 (optional, string, `eventKey0`) ... An events stream key
+    + eventValue0 (optional, string, `eventValue0`) ... `eventKey0`'s value
+    + eventKey1 (optional, string, `eventKey1`) ... An events stream key
+    + eventValue1 (optional, string, `eventValue1`) ... `eventKey1`'s value
+
+### Send Events [GET]
+This is a break in the HTTP/1.1 spec to simplify sending events from devices without JSON serializors or full HTTP libraries with verb support. This route behaves similarly to the JSON route, but doesn't currently allow for overriding timestamps.
+
++ Response 204
++ Response 401
++ Response 402 (application/json)
+    + Body
+    
+            {
+                "message": "Event limit exceeded for current cycle..."
+            }
++ Response 409
 + Response 429
 + Response 500
