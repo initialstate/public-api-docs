@@ -1,8 +1,19 @@
 FORMAT: 1A
-HOST: https://groker.initialstate.com/api
+HOST: https://groker.init.st/api
 
-# Initial State Events Api
-Here you'll find documentation on how to consume the events api for Initial State. At the moment, this api allows sending buffered stream event data to Initial State.
+# Initial State Streaming API
+This is documentation on the Initial State HTTP API for sending data to an Initial State account.
+
+# Group Rate Limiting
+This API is rate limited on a per-account basis. You can see your current rate limit status by investigating the headers on the response to `/events`. This table describes the rate limit headers:
+
+|header|description|
+|------------------------|-----|
+|`X-RateLimit-Limit`|This is the current number of requests per 10 second interval. This value is based on your account plan and `accessKey` rights.|
+|`X-RateLimit-Remaining`|This is the number of requests left from the `X-RateLimit-Limit` during a 10 second interval.|
+|`X-RateLimit-Reset`|This is a Unix epoch in seconds indicating when the `X-RateLimit-Remaining` will be reset back to the value of `X-RateLimit-Limit`.|
+|`Retry-After`|This header is *only* returned during a rate limited request represented by an HTTP 429 Status Code. This value will provide a number of seconds requesting code should wait before retrying the request.|
+
 
 # Group Versioning
 This api is versioned with **semver** style versions, if you're not familiar with semver, check it out [here](http://semver.org/). The api respects the `Accept-Version` HTTP header to provide predictable request/response versioning. You can check the current supported versions by performing a `GET` on the `/versions` route. If you don't include an `Accept-Version` header, the api assumes that you want the latest version. The value of `Accept-Version` can be specified like NPM dependencies.
@@ -37,7 +48,9 @@ Common Successful Response Scenarios:
 
 **Authentication**
 
-Authentication is handled via Access Keys generated from within your [Initial State account](https://www.initialstate.com/app#/account). An example access key looks like this: `fakee8do2JQN3Eos8Ah2FS8uiFD3Ola2`. An Access Key can be provided as an HTTP header, or as a url parameter
+Authentication is handled via Access Keys generated from within your [Initial State account](https://www.initialstate.com/). An example access key looks like this: `ist_fakee8do2JQN3Eos8Ah2FS8uiFD3Ola2`. An Access Key can be provided as an HTTP header, or as a url parameter.
+
+> NOTE: Initial State IoT has access keys that are prefixed with `ist_`. To ensure you're using the latest IoT platform processing path, use `ist_` prefixed access keys.
 
 |type|name/key|
 |----|-----|
@@ -77,11 +90,7 @@ Authentication is handled via Access Keys generated from within your [Initial St
     
             "ACCESS_DENIED_KEY"
             
-+ Response 500 (text/plain)
-
-    + Body
-    
-            "CORE_API_ERROR"
++ Response 500
 
 ## Buckets no-JSON [/buckets?accessKey={accessKey}&bucketKey={bucketKey}&bucketName={bucketName}]
 A `bucket` is a collection of `event` data.
@@ -92,7 +101,7 @@ Common Successful Response Scenarios:
 
 **Authentication**
 
-Authentication is handled via Access Keys generated from within your [Initial State account](https://www.initialstate.com/app#/account). An example access key looks like this: `fakee8do2JQN3Eos8Ah2FS8uiFD3Ola2`. An Access Key can be provided as an HTTP header, or as a url parameter
+Authentication is handled via Access Keys generated from within your [Initial State account](https://www.initialstate.com/). An example access key looks like this: `ist_fakee8do2JQN3Eos8Ah2FS8uiFD3Ola2`. An Access Key can be provided as an HTTP header, or as a url parameter
 
 |type|name/key|
 |----|-----|
@@ -100,7 +109,7 @@ Authentication is handled via Access Keys generated from within your [Initial St
 |URL Parameter|`accessKey`|
 
 + Parameters
-    + accessKey (required, string, `fakee8do2JQN3Eos8Ah2FS8uiFD3Ola2`) ... Access Key
+    + accessKey (required, string, `ist_fakee8do2JQN3Eos8Ah2FS8uiFD3Ola2`) ... Access Key
     + bucketKey (required, string, `bucket1sfa`) ... Unique Bucket Key
     + bucketName (optional, string, `My New Bucket`) ... Friendly Bucket Name
 
@@ -115,11 +124,7 @@ Authentication is handled via Access Keys generated from within your [Initial St
     
             "ACCESS_DENIED_KEY"
             
-+ Response 500 (text/plain)
-
-    + Body
-    
-            "CORE_API_ERROR"
++ Response 500
 
 
 # Group Event Data
@@ -134,16 +139,16 @@ This is the main endpoint for shipping data to Initial State's Events Api. The d
 |type|limit|exceeded response HTTP status code|
 |----|-----|----------------------|
 |`Content-Length`|<= 1 megabyte|`413` Request Entity Too Large|
-|request rate|5 r/s (for non-enterprise)|`429` Too Many Requests|
+|request rate|3 r/s (for non-enterprise)|`429` Too Many Requests|
 
 **Recommended Max Throughput**
-- 5 r/s with 10 events/request
+- 3 r/s with 10 events/request
 
 **Custom Headers**
 
 |name|notes|
 |----|-----|
-|`X-IS-AccessKey`|This is the access key generated from www.initialstate.com account|
+|`X-IS-AccessKey`|This is the access key generated from Initial State account|
 |`X-IS-BucketKey`|This is a user generated key and can be any string exluding characters `:`, `"`, `'`. See *Bucket Creation* endpoint|
 
 **Event JSON Entity**
@@ -156,7 +161,7 @@ This is the main endpoint for shipping data to Initial State's Events Api. The d
 |epoch |*false*|`number`||epoch is in seconds with fractional seconds to right of decimal.|
 |iso8601|*false*|`string`||ISO-8601 Timestamp|
 
-> **Timestamping**: If the client doesn't provide a timestamp, a server timestamp will be automatically provided. If a client provides a valid `epoch` value, the `epoch` will be used instead. If the `iso8601` value is supplied it will be used instead. It's important to note, that if both a valid `epoch` and `iso8601` are supplied, the `epoch` will be used as the source of truth.
+> **Timestamping**: If the client doesn't provide a timestamp, a server timestamp will be automatically provided. If a client provides a valid Unix `epoch` value (seconds since Jan 1, 1970), the `epoch` will be used instead. If the `iso8601` value is supplied it will be used instead. It's important to note, that if both a valid `epoch` and `iso8601` are supplied, the `epoch` will be used as the source of truth.
 
 + Request
     + Headers
@@ -238,7 +243,7 @@ This is the main endpoint for shipping data to Initial State's Events Api. The d
 This route allows for simple URL encoded parameters that represent events. Each url key-value pair represents an event key and event value being sent to Initial State.
 
 + Parameters
-    + accessKey (required, string, `fakee8do2JQN3Eos8Ah2FS8uiFD3Ola2`) ... Access Key
+    + accessKey (required, string, `ist_fakee8do2JQN3Eos8Ah2FS8uiFD3Ola2`) ... Access Key
     + bucketKey (required, string, `bucket1sfa`) ... Bucket Key representing bucket for the events in request
     + eventKey0 (optional, string, `eventKey0`) ... An events stream key
     + eventValue0 (optional, string, `eventValue0`) ... `eventKey0`'s value
