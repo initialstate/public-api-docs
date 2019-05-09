@@ -163,6 +163,8 @@ This is the main endpoint for shipping data to Initial State's Events Api. The d
 
 > **Timestamping**: If the client doesn't provide a timestamp, a server timestamp will be automatically provided. If a client provides a valid Unix `epoch` value (seconds since Jan 1, 1970), the `epoch` will be used instead. If the `iso8601` value is supplied it will be used instead. It's important to note, that if both a valid `epoch` and `iso8601` are supplied, the `epoch` will be used as the source of truth.
 
+> **Timestamp Validity**: If the client provided timestamp `epoch` or `iso8601` is 10 years or more behind canonical universal time, the client provided timestamp will be ignored.
+
 + Request
     + Headers
             
